@@ -47,6 +47,8 @@ struct ID3v2Tag {
 
     std::string imageName;
 
+    bool includeImage;
+
     void writeHeaderFrame(std::fstream& file, unsigned int size) {
         file.write(headerFrame, sizeof(headerFrame));
         writeSyncSafeSize(file, size);
@@ -70,7 +72,7 @@ struct ID3v2Tag {
     }
 
     void writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size) {
-        std::fstream picture("../images/" + fileName, std::ios::in | std::ios::binary);
+        std::fstream picture("images/" + fileName, std::ios::in | std::ios::binary);
         
         // Frame ID
         file.write(attachedPictureID, sizeof(attachedPictureID));
@@ -151,10 +153,10 @@ struct ID3v2Tag {
     }
 };
 
-void tagMP3File(std::fstream& file, ID3v2Tag tag, bool includeImage) {
+void tagMP3File(std::fstream& file, ID3v2Tag tag) {
     if(file.is_open()) {
         unsigned int sizeOfAllFrames = 0;
-        unsigned int sizeOfAttachedPictureFrame;
+        unsigned int sizeOfAttachedPictureFrame = 0;
 
         // 10 = frame header size, 1 = encoding
         sizeOfAllFrames += 10 + strlen(tag.title) + 1;
@@ -163,8 +165,8 @@ void tagMP3File(std::fstream& file, ID3v2Tag tag, bool includeImage) {
         sizeOfAllFrames += 10 + strlen(tag.track) + 1;
         sizeOfAllFrames += 10 + strlen(tag.releaseDate) + 1;
 
-        if(includeImage) {
-            sizeOfAttachedPictureFrame = 4  + std::filesystem::file_size("../images/" + tag.imageName);
+        if(tag.includeImage) {
+            sizeOfAttachedPictureFrame = 4  + std::filesystem::file_size("images/" + tag.imageName);
 
             if(isPng(tag.imageName)) sizeOfAttachedPictureFrame += strlen(tag.mimeTypePng);
             else if(isJpeg(tag.imageName)) sizeOfAttachedPictureFrame += strlen(tag.mimeTypeJpeg);
@@ -187,6 +189,6 @@ void tagMP3File(std::fstream& file, ID3v2Tag tag, bool includeImage) {
 
         tag.writeTextFrame(file, tag.releaseDateID, tag.releaseDate);
 
-        if(includeImage) tag.writeAttachedPictureFrame(file, tag.imageName, sizeOfAttachedPictureFrame);
+        if(tag.includeImage) tag.writeAttachedPictureFrame(file, tag.imageName, sizeOfAttachedPictureFrame);
     }
 }

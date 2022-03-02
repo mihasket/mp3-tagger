@@ -38,9 +38,9 @@ unsigned int getID3v2TagSize(std::fstream& file) {
 
     file.clear();
     file.seekg(6);
-        // Get the tag header size
+    // Get the tag header size
     file.read(data, 4);
-        // Calculate the tag header size in to a number
+    // Calculate the tag header size in to a number
     size = data[0] << 21;
     size += data[1] << 14;
     size += data[2] << 7;

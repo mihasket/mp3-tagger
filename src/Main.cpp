@@ -8,13 +8,10 @@
 int main() {
     const unsigned int size = getNumberOfMp3Files();
     unsigned int filePosition = 0;
-    bool includeImage;
     ID3v2Tag tag[size];
     std::string fileNames[size];
     std::string taggedFileNames[size];
     std::fstream mp3Files[size];
-
-    // Fstream objects where i write the tagged data
     std::fstream taggedMp3Files[size];
 
     outputMp3FileNames();
@@ -25,12 +22,12 @@ int main() {
     // Input file stream data
     for(unsigned int i = 0; i < size; i++) {
         ++filePosition;
-        inputTagDescription(tag[i], filePosition, includeImage);
+        inputTagDescription(tag[i], filePosition, fileNames[i]);
     }
 
     // Tagging
     for(unsigned int i = 0; i < size; i++) {
-        tagMP3File(taggedMp3Files[i], tag[i], includeImage);
+        tagMP3File(taggedMp3Files[i], tag[i]);
     }
 
     // Copy information to new file

@@ -57,8 +57,8 @@ void outputImageNames() {
     }
 }
 
-void inputTagDescription(ID3v2Tag& tag, const unsigned int filePosition, bool& includeImage) {
-    std::cout << "File " << filePosition << ".\n";
+void inputTagDescription(ID3v2Tag& tag, const unsigned int filePosition, std::string fileName) {
+    std::cout << filePosition << ". " << fileName << '\n';
     
     std::cout << "Title: ";
     std::cin.getline(tag.title, 100);
@@ -86,10 +86,10 @@ void inputTagDescription(ID3v2Tag& tag, const unsigned int filePosition, bool& i
         outputImageNames();
         std::cout << "Image (file name): ";
         getline(std::cin, tag.imageName);
-        includeImage = true;
+        tag.includeImage = true;
     }
     else {
-        includeImage = false;
+        tag.includeImage = false;
     }
 
     std::cout << '\n';

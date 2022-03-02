@@ -44,6 +44,8 @@ struct ID3v2Tag {
 
     std::string imageName;
 
+    bool includeImage;
+
     void writeHeaderFrame(std::fstream& file, unsigned int size);
 
     void writeTextFrame(std::fstream& file, const char tagID[4], char information[]);
@@ -57,6 +59,6 @@ struct ID3v2Tag {
     unsigned int getID3v2TagSize(std::fstream& file);
 };
 
-void tagMP3File(std::fstream& file, ID3v2Tag tag, bool includeImage);
+void tagMP3File(std::fstream& file, ID3v2Tag tag);
 
 #endif
