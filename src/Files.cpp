@@ -94,7 +94,7 @@ void createTaggedFstreamObjects(std::fstream file[], std::string fileNames[]) {
         std::string fileName = std::string(entry.path()); 
 
         if(isMp3(fileName)) {
-            fileName.insert(fileName.size()-4, 1, '1');
+            fileName.insert(fileName.size()-4, 1, '_');
             fileNames[i] = fileName;
 
             file[i].open(fileName, std::ios::out | std::ios::binary);

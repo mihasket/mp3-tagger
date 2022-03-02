@@ -1,5 +1,6 @@
 # ID3v2 Tagger
 A C++ program for ID3v2.3 MP3 tagging.
+A work in progress.
 
 # Installation
 Clone this repository
@@ -9,7 +10,8 @@ git clone https://github.com/mihasket/ID3v2-Tagger.git
 
 # How?
 Put the MP3 files into the folder mp3files.
-Put the PNG/JPEG files into the folder images. The only supported image file extensions are PNG and JPG/JPEG
+Put the PNG/JPEG files into the folder images. 
+The only supported image file extensions are PNG and JPG/JPEG
 
 Run with command:
 ```
