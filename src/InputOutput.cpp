@@ -58,7 +58,7 @@ void outputImageNames() {
 }
 
 void inputTagDescription(ID3v2Tag& tag, const unsigned int filePosition, std::string fileName) {
-    std::cout << filePosition << ". " << fileName << '\n';
+    std::cout << filePosition << ". " << cutPath(fileName, fileName.size()) << '\n';
     
     std::cout << "Title: ";
     std::cin.getline(tag.title, 100);
