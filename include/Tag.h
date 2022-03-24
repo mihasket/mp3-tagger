@@ -1,38 +1,39 @@
 #ifndef TAG_H
 #define TAG_H
 
-struct ID3v2Tag {
+class ID3v2Tag {
+private:
     //ID3, then version (0x03, 0x00)
     const char headerFrame[6] = { 0x49, 0x44, 0x33, 0x03, 0x00, 0x00};
 
     // TIT2 ID for song titles
-    const char titleID[4] = { 0x54, 0x49, 0x54, 0x32};
+    const char* titleID = "TIT2";
 
     // TPE1 ID for artist name
-    const char artistID[4] = { 0x54, 0x50, 0x45, 0x31};
+    const char* artistID = "TPE1";
 
     // TALB ID for album name
-    const char albumID[4] = { 0x54, 0x41, 0x4C, 0x42};
+    const char* albumID = "TALB";
 
     // TRCK ID for track number
-    const char trackID[4] = { 0x54, 0x52, 0x43, 0x4B};
+    const char* trackID = "TRCK";
 
     // TYER ID for release date
-    const char releaseDateID[4] = { 0x54, 0x59, 0x45, 0x52};
+    const char* releaseDateID = "TYER";
 
     // APIC ID for attached pictures
-    const char attachedPictureID[4] { 0x41, 0x50, 0x49, 0x43};
-
+    const char* attachedPictureID = "APIC";
+     
     const char flags[2] = { 0x00, 0x00};
 
     // Text encoding UTF-8
     const char textEncoding[1] = {0x03};
 
     // MIME type for png
-    char mimeTypePng[10] = "image/png";
+    const char* mimeTypePng = "image/png";
 
     // MIME type for jpeg
-    char mimeTypeJpeg[11] = "image/jpeg";
+    const char* mimeTypeJpeg = "image/jpeg";
 
     // Picture type for attached pictures, 0x03 = Front album cover
     const char pictureType[1] = {0x03};
@@ -48,7 +49,7 @@ struct ID3v2Tag {
 
     void writeHeaderFrame(std::fstream& file, unsigned int size);
 
-    void writeTextFrame(std::fstream& file, const char tagID[4], char information[]);
+    void writeTextFrame(std::fstream& file, const char* tagID, char information[]);
 
     void writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size);
 
@@ -56,9 +57,14 @@ struct ID3v2Tag {
 
     void writeSyncUnsafeSize(std::fstream& file, unsigned int size);
 
-    unsigned int getID3v2TagSize(std::fstream& file);
-};
+public:
+    void tagMP3File(std::fstream& file);
 
-void tagMP3File(std::fstream& file, ID3v2Tag tag);
+    void inputTagDescription(std::string fileName, const unsigned int filePosition);
+
+    bool hasID3v2Tag(std::fstream& file) const;
+
+    unsigned int getID3v2TagSize(std::fstream& file) const;
+};
 
 #endif

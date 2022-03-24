@@ -7,18 +7,6 @@
 
 using std::filesystem::directory_iterator;
 
-bool hasID3v2Tag(std::fstream& file) {
-    char data[3];
-
-    file.clear();
-    file.seekg(0);
-
-    file.read(data, 3);
-
-    if(strcmp(data, "ID3") == 0) return true;
-    else return false;
-}
-
 unsigned int getNumberOfMp3Files() {
     std::string path = "mp3files/";
     unsigned int numberOfFiles = 0;
@@ -32,30 +20,13 @@ unsigned int getNumberOfMp3Files() {
     return numberOfFiles;
 }
 
-unsigned int getID3v2TagSize(std::fstream& file) {
-    char data[4];
-    unsigned int size = 0;
-
-    file.clear();
-    file.seekg(6);
-    // Get the tag header size
-    file.read(data, 4);
-    // Calculate the tag header size in to a number
-    size = data[0] << 21;
-    size += data[1] << 14;
-    size += data[2] << 7;
-    size += data[3];
-
-    return size;
-}
-
-void copyMP3DataToFile(std::fstream& taggedFile, std::fstream& originalFile) {
+void copyMP3DataToFile(std::fstream& taggedFile, std::fstream& originalFile, ID3v2Tag& tag) {
     char byte;
     unsigned int size = 0;
     // Check if the original file has a ID3 tag at the beggining
     if(taggedFile.is_open() && originalFile.is_open()) {
-        if(hasID3v2Tag(originalFile)) {
-            size = getID3v2TagSize(originalFile);
+        if(tag.hasID3v2Tag(originalFile)) {
+            size = tag.getID3v2TagSize(originalFile);
         }
         else {
             std::cerr << "No ID3v2 tag!\n";

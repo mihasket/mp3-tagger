@@ -2,174 +2,132 @@
 #include <fstream>
 #include <string.h>
 #include <filesystem>
+#include "../include/Tag.h"
 #include "../include/FileExtension.h"
+#include "../include/FileNames.h"
 
-struct ID3v2Tag {
-    //ID3, then version (0x03, 0x00)
-    const char headerFrame[6] = { 0x49, 0x44, 0x33, 0x03, 0x00, 0x00};
+void ID3v2Tag::writeHeaderFrame(std::fstream& file, unsigned int size) {
+    file.write(headerFrame, sizeof(headerFrame));
+    writeSyncSafeSize(file, size);
+}
 
-    // TIT2 ID for song titles
-    const char titleID[4] = { 0x54, 0x49, 0x54, 0x32};
+void ID3v2Tag::writeTextFrame(std::fstream& file, const char* tagID, char information[]) {
+    // Identifier
+    file.write(tagID, 4);
 
-    // TPE1 ID for artist name
-    const char artistID[4] = { 0x54, 0x50, 0x45, 0x31};
-
-    // TALB ID for album name
-    const char albumID[4] = { 0x54, 0x41, 0x4C, 0x42};
-
-    // TRCK ID for track number
-    const char trackID[4] = { 0x54, 0x52, 0x43, 0x4B};
-
-    // TYER ID for release date
-    const char releaseDateID[4] = { 0x54, 0x59, 0x45, 0x52};
-
-    // APIC ID for attached pictures
-    const char attachedPictureID[4] { 0x41, 0x50, 0x49, 0x43};
-
-    const char flags[2] = { 0x00, 0x00};
-
-    // Text encoding UTF-8
-    const char textEncoding[1] = {0x03};
-
-    // MIME type for png
-    char mimeTypePng[10] = "image/png";
-
-    // MIME type for jpeg
-    char mimeTypeJpeg[11] = "image/jpeg";
-
-    // Picture type for attached pictures, 0x03 = Front album cover
-    const char pictureType[1] = {0x03};
-
-    // Null byte
-    const char null[1] = {0x00};
-
-    char title[100], artist[100], album[100], track[5], releaseDate[5];
-
-    std::string imageName;
-
-    bool includeImage;
-
-    void writeHeaderFrame(std::fstream& file, unsigned int size) {
-        file.write(headerFrame, sizeof(headerFrame));
-        writeSyncSafeSize(file, size);
-    }
-
-    void writeTextFrame(std::fstream& file, const char tagID[4], char information[]) {
-        // Identifier
-        file.write(tagID, 4);
-
-        // Size descriptor
-        writeSyncUnsafeSize(file, strlen(information)+1);
+    // Size descriptor
+    writeSyncUnsafeSize(file, strlen(information)+1);
         
-        // Flags
-        file.write(flags, sizeof(flags));
+    // Flags
+    file.write(flags, sizeof(flags));
 
-        // Text encoding
-        file.write(textEncoding, sizeof(textEncoding));
+    // Text encoding
+    file.write(textEncoding, sizeof(textEncoding));
 
-        // Information text
-        file.write(information, sizeof(char) * strlen(information));
-    }
+    // Information text
+    file.write(information, strlen(information));
+}
 
-    void writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size) {
-        std::fstream picture("images/" + fileName, std::ios::in | std::ios::binary);
+void ID3v2Tag::writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size) {
+    std::fstream picture("images/" + fileName, std::ios::in | std::ios::binary);
         
-        // Frame ID
-        file.write(attachedPictureID, sizeof(attachedPictureID));
+    // Frame ID
+    file.write(attachedPictureID, 4);
 
-        // Size descriptor
-        writeSyncUnsafeSize(file, size);
+    // Size descriptor
+    writeSyncUnsafeSize(file, size);
 
-        // Flags
-        file.write(flags, sizeof(flags));
+    // Flags
+    file.write(flags, sizeof(flags));
 
-        // Text encoding
-        file.write(textEncoding, sizeof(textEncoding));
+    // Text encoding
+    file.write(textEncoding, sizeof(textEncoding));
 
-        // MIME type
-        if(isJpeg(fileName)) {
-            file.write(mimeTypeJpeg, strlen(mimeTypeJpeg));
-        }
-        else if(isPng(fileName)) {
-            file.write(mimeTypePng, strlen(mimeTypePng));
-        }
+    // MIME type
+    if(isJpeg(fileName)) {
+        file.write(mimeTypeJpeg, strlen(mimeTypeJpeg));
+    }
+    else if(isPng(fileName)) {
+        file.write(mimeTypePng, strlen(mimeTypePng));
+    }
 
-        file.write(null, sizeof(null));
+    file.write(null, sizeof(null));
 
-        // Picture type
-        file.write(pictureType, sizeof(pictureType));
+    // Picture type
+    file.write(pictureType, sizeof(pictureType));
 
-        // Description
-        file.write(null, sizeof(null));
+    // Description
+    file.write(null, sizeof(null));
         
-        // Picture data
-        char byte;
+    // Picture data
+    char byte;
 
-        while(picture.get(byte)) {
-            file.write(&byte, 1);
-        }
-
-        picture.close();
+    while(picture.get(byte)) {
+        file.write(&byte, 1);
     }
 
-    void writeSyncSafeSize(std::fstream& file, unsigned int size) {
-        unsigned int maxSize = 268435455;
-        unsigned int syncSafeMask = 254 << 24; // 4261412864
+    picture.close();
+}   
 
-        if(size <= maxSize) {
-            size <<= 4;
+// Write tag header size
+void ID3v2Tag::writeSyncSafeSize(std::fstream& file, unsigned int size) {
+    unsigned int maxSize = 268435455;
+    unsigned int syncSafeMask = 254 << 24; // 4261412864
 
-            for(int i = 0; i < 4; i++) {
-                unsigned int byte = size & syncSafeMask;
-                byte >>= 25;
+    if(size <= maxSize) {
+        size <<= 4;
 
-                file.write(reinterpret_cast<char*>(&byte), 1);
+        for(int i = 0; i < 4; i++) {
+            unsigned int byte = size & syncSafeMask;
+            byte >>= 25;
 
-                size <<= 7;
-            }
-        }
-        else {
-            std::cerr << "Error! Size is bigger than the maximum sync safe size.\n";
-        }
-    }
+            file.write(reinterpret_cast<char*>(&byte), 1);
 
-    void writeSyncUnsafeSize(std::fstream& file, unsigned int size) {
-        unsigned int maxSize = 4294967295;
-        unsigned int synchUnsafeMask = 255 << 24; // 4278190080
-
-        if(size <= maxSize) {
-            for(int i = 0; i < 4; i++) {
-                unsigned int byte = size & synchUnsafeMask;
-                byte >>= 24;
-
-                file.write(reinterpret_cast<char*>(&byte), 1);
-
-                size <<= 8;
-            }
-        }
-        else {
-            std::cerr << "Error! Size is bigger than the maximum sync unsafe size.\n";
+            size <<= 7;
         }
     }
-};
+    else {
+        std::cerr << "Error! Size is bigger than the maximum sync safe size.\n";
+    }
+}
 
-void tagMP3File(std::fstream& file, ID3v2Tag tag) {
+// Write frame size
+void ID3v2Tag::writeSyncUnsafeSize(std::fstream& file, unsigned int size) {
+    unsigned int maxSize = 4294967295;
+    unsigned int synchUnsafeMask = 255 << 24; // 4278190080
+
+    if(size <= maxSize) {
+        for(int i = 0; i < 4; i++) {
+            unsigned int byte = size & synchUnsafeMask;
+            byte >>= 24;
+
+            file.write(reinterpret_cast<char*>(&byte), 1);
+
+            size <<= 8;
+        }
+    }
+    else {
+        std::cerr << "Error! Size is bigger than the maximum sync unsafe size.\n";
+    }
+}
+
+void ID3v2Tag::tagMP3File(std::fstream& file) {
     if(file.is_open()) {
         unsigned int sizeOfAllFrames = 0;
         unsigned int sizeOfAttachedPictureFrame = 0;
 
         // 10 = frame header size, 1 = encoding
-        sizeOfAllFrames += 10 + strlen(tag.title) + 1;
-        sizeOfAllFrames += 10 + strlen(tag.artist) + 1;
-        sizeOfAllFrames += 10 + strlen(tag.album) + 1;
-        sizeOfAllFrames += 10 + strlen(tag.track) + 1;
-        sizeOfAllFrames += 10 + strlen(tag.releaseDate) + 1;
+        sizeOfAllFrames += 10 + strlen(title) + 1;
+        sizeOfAllFrames += 10 + strlen(artist) + 1;
+        sizeOfAllFrames += 10 + strlen(album) + 1;
+        sizeOfAllFrames += 10 + strlen(track) + 1;
+        sizeOfAllFrames += 10 + strlen(releaseDate) + 1;
 
-        if(tag.includeImage) {
-            sizeOfAttachedPictureFrame = 4  + std::filesystem::file_size("images/" + tag.imageName);
+        if(includeImage) {
+            sizeOfAttachedPictureFrame = 4  + std::filesystem::file_size("images/" + imageName);
 
-            if(isPng(tag.imageName)) sizeOfAttachedPictureFrame += strlen(tag.mimeTypePng);
-            else if(isJpeg(tag.imageName)) sizeOfAttachedPictureFrame += strlen(tag.mimeTypeJpeg);
+            if(isPng(imageName)) sizeOfAttachedPictureFrame += strlen(mimeTypePng);
+            else if(isJpeg(imageName)) sizeOfAttachedPictureFrame += strlen(mimeTypeJpeg);
 
             sizeOfAllFrames += 10 + sizeOfAttachedPictureFrame;
         }
@@ -177,18 +135,81 @@ void tagMP3File(std::fstream& file, ID3v2Tag tag) {
         file.clear();
         file.seekg(0);
 
-        tag.writeHeaderFrame(file, sizeOfAllFrames);
+        writeHeaderFrame(file, sizeOfAllFrames);
+        
+        writeTextFrame(file, titleID, title);
+        writeTextFrame(file, artistID, artist);
+        writeTextFrame(file, albumID, album);
+        writeTextFrame(file, trackID, track);
+        writeTextFrame(file, releaseDateID, releaseDate);
 
-        tag.writeTextFrame(file, tag.titleID, tag.title);
-
-        tag.writeTextFrame(file, tag.artistID, tag.artist);
-
-        tag.writeTextFrame(file, tag.albumID, tag.album);
-
-        tag.writeTextFrame(file, tag.trackID, tag.track);
-
-        tag.writeTextFrame(file, tag.releaseDateID, tag.releaseDate);
-
-        if(tag.includeImage) tag.writeAttachedPictureFrame(file, tag.imageName, sizeOfAttachedPictureFrame);
+        if(includeImage) writeAttachedPictureFrame(file, imageName, sizeOfAttachedPictureFrame);
     }
+}
+
+void ID3v2Tag::inputTagDescription(std::string fileName, const unsigned int filePosition) {
+    std::cout << filePosition << ". " << cutPath(fileName, fileName.size()) << '\n';
+    
+    std::cout << "Title: ";
+    std::cin.getline(title, 100);
+
+    std::cout << "Artist: ";
+    std::cin.getline(artist, 100);
+
+    std::cout << "Album: ";
+    std::cin.getline(album, 100);
+
+    std::cout << "Track number: ";
+    std::cin.getline(track, 5);
+
+    std::cout << "Release date: ";
+    std::cin.getline(releaseDate, 5);
+
+    char choice;
+    std::cout << "Do you want to tag an image? (y,n): ";
+    std::cin >> choice;
+
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+
+    if(choice == 'y' || choice == 'Y') {
+        outputImageNames();
+        std::cout << "Image (file name): ";
+        getline(std::cin, imageName);
+        includeImage = true;
+    }
+    else {
+        includeImage = false;
+    }
+
+    std::cout << '\n';
+}
+
+bool ID3v2Tag::hasID3v2Tag(std::fstream& file) const {
+    char data[3];
+
+    file.clear();
+    file.seekg(0);
+
+    file.read(data, 3);
+
+    if(strcmp(data, "ID3") == 0) return true;
+    else return false;
+}
+
+unsigned int ID3v2Tag::getID3v2TagSize(std::fstream& file) const {
+    char data[4];
+    unsigned int size = 0;
+
+    file.clear();
+    file.seekg(6);
+    // Get the tag header size
+    file.read(data, 4);
+    // Calculate the tag header size in to a number
+    size = data[0] << 21;
+    size += data[1] << 14;
+    size += data[2] << 7;
+    size += data[3];
+
+    return size;
 }

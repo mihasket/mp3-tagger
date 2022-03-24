@@ -3,11 +3,10 @@
 #include "../include/Tag.h"
 #include "../include/Files.h"
 #include "../include/FileExtension.h"
-#include "../include/InputOutput.h"
+#include "../include/FileNames.h"
 
 int main() {
     const unsigned int size = getNumberOfMp3Files();
-    unsigned int filePosition = 0;
     ID3v2Tag tag[size];
     std::string fileNames[size];
     std::string taggedFileNames[size];
@@ -21,18 +20,17 @@ int main() {
 
     // Input file stream data
     for(unsigned int i = 0; i < size; i++) {
-        ++filePosition;
-        inputTagDescription(tag[i], filePosition, fileNames[i]);
+        tag[i].inputTagDescription(fileNames[i], i+1);
     }
 
     // Tagging
     for(unsigned int i = 0; i < size; i++) {
-        tagMP3File(taggedMp3Files[i], tag[i]);
+        tag[i].tagMP3File(taggedMp3Files[i]);
     }
 
     // Copy information to new file
     for(unsigned int i = 0; i < size; i++) {
-        copyMP3DataToFile(taggedMp3Files[i], mp3Files[i]);
+        copyMP3DataToFile(taggedMp3Files[i], mp3Files[i], tag[i]);
     }
 
     // Remove old files
