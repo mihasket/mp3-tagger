@@ -1,0 +1,1 @@
+# Put your PNG/JPEG images in this folder.
