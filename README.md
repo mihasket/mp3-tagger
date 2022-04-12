@@ -2,6 +2,9 @@
 A C++ program for ID3v2.3 MP3 tagging.
 A work in progress.
 
+# TO DO
+Add option to tag genre.
+
 # Installation
 Clone this repository
 ```bash
