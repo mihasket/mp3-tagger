@@ -11,7 +11,7 @@ void ID3v2Tag::writeHeaderFrame(std::fstream& file, unsigned int size) {
     writeSyncSafeSize(file, size);
 }
 
-void ID3v2Tag::writeTextFrame(std::fstream& file, const char* tagID, char information[]) {
+void ID3v2Tag::writeTextFrame(std::fstream& file, const char* tagID, const char* information) {
     // Identifier
     file.write(tagID, 4);
 

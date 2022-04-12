@@ -49,7 +49,7 @@ private:
 
     void writeHeaderFrame(std::fstream& file, unsigned int size);
 
-    void writeTextFrame(std::fstream& file, const char* tagID, char information[]);
+    void writeTextFrame(std::fstream& file, const char* tagID, const char* information);
 
     void writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size);
 
