@@ -2,9 +2,6 @@
 A C++ program for ID3v2.3 MP3 tagging.
 A work in progress.
 
-# TO DO
-Add option to tag genre.
-
 # Installation
 Clone this repository
 ```bash
@@ -28,12 +25,23 @@ Run with command:
 MP3 files:
 1. song.mp3
 
-File 1.
+1. song.mp3
 Title: Apples and Oranges
 Artist: Miha
 Album: Github EP
 Track number: 1
 Release date: 2022
+Do you want to tag an image? (y,n): y
+0. Blues
+1. Classic Rock
+2. Country
+.
+.
+.
+77. Musical
+78. Rock & Roll
+79. Hard Rock
+Input a number: 71
 Do you want to tag an image? (y,n): y
 
 JPEG/PNG images:
