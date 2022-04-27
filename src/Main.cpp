@@ -1,8 +1,6 @@
-#include <iostream>
 #include <fstream>
 #include "../include/Tag.h"
 #include "../include/Files.h"
-#include "../include/FileExtension.h"
 #include "../include/FileNames.h"
 
 int main() {
