@@ -5,13 +5,14 @@
 #include "../include/Tag.h"
 #include "../include/FileExtension.h"
 #include "../include/FileNames.h"
+#include "../include/Genre.h"
 
-void ID3v2Tag::writeHeaderFrame(std::fstream& file, unsigned int size) {
+void ID3v2Tag::writeHeaderFrame(std::fstream& file, unsigned int size) const{
     file.write(headerFrame, sizeof(headerFrame));
     writeSyncSafeSize(file, size);
 }
 
-void ID3v2Tag::writeTextFrame(std::fstream& file, const char* tagID, const char* information) {
+void ID3v2Tag::writeTextFrame(std::fstream& file, const char* tagID, const char* information) const{
     // Identifier
     file.write(tagID, 4);
 
@@ -28,7 +29,7 @@ void ID3v2Tag::writeTextFrame(std::fstream& file, const char* tagID, const char*
     file.write(information, strlen(information));
 }
 
-void ID3v2Tag::writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size) {
+void ID3v2Tag::writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size) const {
     std::fstream picture("images/" + fileName, std::ios::in | std::ios::binary);
         
     // Frame ID
@@ -70,7 +71,7 @@ void ID3v2Tag::writeAttachedPictureFrame(std::fstream& file, std::string fileNam
 }   
 
 // Write tag header size
-void ID3v2Tag::writeSyncSafeSize(std::fstream& file, unsigned int size) {
+void ID3v2Tag::writeSyncSafeSize(std::fstream& file, unsigned int size) const {
     unsigned int maxSize = 268435455;
     unsigned int syncSafeMask = 254 << 24; // 4261412864
 
@@ -88,11 +89,12 @@ void ID3v2Tag::writeSyncSafeSize(std::fstream& file, unsigned int size) {
     }
     else {
         std::cerr << "Error! Size is bigger than the maximum sync safe size.\n";
+        exit(1);
     }
 }
 
 // Write frame size
-void ID3v2Tag::writeSyncUnsafeSize(std::fstream& file, unsigned int size) {
+void ID3v2Tag::writeSyncUnsafeSize(std::fstream& file, unsigned int size) const {
     unsigned int maxSize = 4294967295;
     unsigned int synchUnsafeMask = 255 << 24; // 4278190080
 
@@ -108,10 +110,11 @@ void ID3v2Tag::writeSyncUnsafeSize(std::fstream& file, unsigned int size) {
     }
     else {
         std::cerr << "Error! Size is bigger than the maximum sync unsafe size.\n";
+        exit(1);
     }
 }
 
-void ID3v2Tag::tagMP3File(std::fstream& file) {
+void ID3v2Tag::tagMP3File(std::fstream& file) const {
     if(file.is_open()) {
         unsigned int sizeOfAllFrames = 0;
         unsigned int sizeOfAttachedPictureFrame = 0;
@@ -123,11 +126,19 @@ void ID3v2Tag::tagMP3File(std::fstream& file) {
         sizeOfAllFrames += 10 + strlen(track) + 1;
         sizeOfAllFrames += 10 + strlen(releaseDate) + 1;
 
+        if(includeGenre) {
+            sizeOfAllFrames += 10 + genreName.size() + 1;
+        }
+
         if(includeImage) {
             sizeOfAttachedPictureFrame = 4  + std::filesystem::file_size("images/" + imageName);
 
-            if(isPng(imageName)) sizeOfAttachedPictureFrame += strlen(mimeTypePng);
-            else if(isJpeg(imageName)) sizeOfAttachedPictureFrame += strlen(mimeTypeJpeg);
+            if(isPng(imageName)) {
+                sizeOfAttachedPictureFrame += strlen(mimeTypePng);
+            }
+            else if(isJpeg(imageName)) {
+                sizeOfAttachedPictureFrame += strlen(mimeTypeJpeg);
+            }
 
             sizeOfAllFrames += 10 + sizeOfAttachedPictureFrame;
         }
@@ -142,8 +153,13 @@ void ID3v2Tag::tagMP3File(std::fstream& file) {
         writeTextFrame(file, albumID, album);
         writeTextFrame(file, trackID, track);
         writeTextFrame(file, releaseDateID, releaseDate);
+        if(includeGenre) {
+            writeTextFrame(file, contentTypeID, genreName.c_str());
+        }
 
-        if(includeImage) writeAttachedPictureFrame(file, imageName, sizeOfAttachedPictureFrame);
+        if(includeImage) {
+            writeAttachedPictureFrame(file, imageName, sizeOfAttachedPictureFrame);
+        }
     }
 }
 
@@ -166,6 +182,28 @@ void ID3v2Tag::inputTagDescription(std::string fileName, const unsigned int file
     std::cin.getline(releaseDate, 5);
 
     char choice;
+    std::cout << "Do you want to tag a genre? (y,n): ";
+    std::cin >> choice;
+
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+
+    if(choice == 'y' || choice == 'Y') {
+        int index;
+        Genre::outputGenres();
+
+        std::cout << "Input a number: ";
+        std::cin >> index;
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+
+        genreName = Genre::getGenre(index);
+        includeGenre = true;
+    }
+    else {
+        includeGenre = false;
+    }
+
     std::cout << "Do you want to tag an image? (y,n): ";
     std::cin >> choice;
 
@@ -193,8 +231,11 @@ bool ID3v2Tag::hasID3v2Tag(std::fstream& file) const {
 
     file.read(data, 3);
 
-    if(strcmp(data, "ID3") == 0) return true;
-    else return false;
+    if(strcmp(data, "ID3") == 0) {
+        return true;
+    }
+    
+    return false;
 }
 
 unsigned int ID3v2Tag::getID3v2TagSize(std::fstream& file) const {

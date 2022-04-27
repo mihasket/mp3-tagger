@@ -23,7 +23,11 @@ private:
 
     // APIC ID for attached pictures
     const char* attachedPictureID = "APIC";
-     
+
+    // TCON ID for content type, used for tagging genres
+    const char* contentTypeID = "TCON";
+    
+    // Two flag bytes, they are unused so they are cleared
     const char flags[2] = { 0x00, 0x00};
 
     // Text encoding UTF-8
@@ -42,23 +46,24 @@ private:
     const char null[1] = {0x00};
 
     char title[100], artist[100], album[100], track[5], releaseDate[5];
+    std::string imageName, genreName;
+    bool includeImage, includeGenre;
 
-    std::string imageName;
+    // Methods
+    void writeHeaderFrame(std::fstream& file, unsigned int size) const;
 
-    bool includeImage;
+    void writeTextFrame(std::fstream& file, const char* tagID, const char* information) const;
 
-    void writeHeaderFrame(std::fstream& file, unsigned int size);
+    void writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size) const;
 
-    void writeTextFrame(std::fstream& file, const char* tagID, const char* information);
+    void writeSyncSafeSize(std::fstream& file, unsigned int size) const;
 
-    void writeAttachedPictureFrame(std::fstream& file, std::string fileName, const unsigned int size);
-
-    void writeSyncSafeSize(std::fstream& file, unsigned int size);
-
-    void writeSyncUnsafeSize(std::fstream& file, unsigned int size);
+    void writeSyncUnsafeSize(std::fstream& file, unsigned int size) const;
 
 public:
-    void tagMP3File(std::fstream& file);
+    ID3v2Tag() = default;
+
+    void tagMP3File(std::fstream& file) const;
 
     void inputTagDescription(std::string fileName, const unsigned int filePosition);
 
