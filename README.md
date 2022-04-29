@@ -5,7 +5,7 @@ A work in progress.
 # Installation
 Clone this repository
 ```bash
-git clone https://github.com/mihasket/ID3v2-Tagger.git
+git clone https://github.com/mihasket/mp3-tagger.git
 ```
 
 # How?
