@@ -20,8 +20,10 @@ The only supported image file extensions are PNG and JPG/JPEG.
 
 After installing, run with command:
 ```
+make compile
 make run
 ```
+You only have to run make compile for the first time.
 
 # Example
 ```
