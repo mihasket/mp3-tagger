@@ -1,7 +1,6 @@
 APPNAME := mp3tagger
 CXX := g++
 CXXFLAGS := -Wall -g
-LDFLAGS := -g $(pkg-config --ldflags)
 
 SRC := src
 INC := include
