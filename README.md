@@ -6,8 +6,11 @@ A work in progress.
 Clone this repository
 ```bash
 git clone https://github.com/mihasket/mp3-tagger.git
+<<<<<<< HEAD
 cd mp3-tagger
 make install
+=======
+>>>>>>> f2a0ca48dd778f1e4a146a4a69fccaf2d68d9242
 ```
 This will create 3 directories:
 - images 
