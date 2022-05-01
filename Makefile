@@ -8,7 +8,7 @@ OBJ := obj
 DIRECTORIES := mp3files/ images/ obj/
 OBJECTS := $(OBJ)/Main.o $(OBJ)/FileExtension.o $(OBJ)/FileNames.o $(OBJ)/Files.o $(OBJ)/Genre.o $(OBJ)/Tag.o
 
-all: $(OBJECTS)
+compile: $(OBJECTS)
 
 $(OBJECTS): $(OBJ)/%.o: $(SRC)/%.cpp
 
