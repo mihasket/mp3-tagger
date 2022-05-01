@@ -5,22 +5,27 @@ A work in progress.
 # Installation
 Clone this repository
 ```bash
-git clone https://github.com/mihasket/ID3v2-Tagger.git
+git clone https://github.com/mihasket/mp3-tagger.git
+cd mp3-tagger
+make install
 ```
+This will create 3 directories:
+- images 
+- mp3files
+- obj
 
-# How?
-Put the MP3 files into the folder mp3files.
-Put the PNG/JPEG files into the folder images. 
-The only supported image file extensions are PNG and JPG/JPEG
+# Usage
+Put the MP3 files into the directory mp3files. Put the PNG/JPEG files into the directory images.
+The only supported image file extensions are PNG and JPG/JPEG.
 
-Run with command:
+After installing, run with command:
 ```
-./make.sh
+make run
 ```
 
 # Example
 ```
-./make.sh
+make run
 
 MP3 files:
 1. song.mp3
