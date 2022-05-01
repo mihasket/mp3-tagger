@@ -1,4 +1,4 @@
-# ID3v2 Tagger
+# MP3 Tagger
 A C++ program for ID3v2.3 MP3 tagging.
 A work in progress.
 
