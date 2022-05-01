@@ -4,3 +4,6 @@
 *.jpg
 *.png
 .vscode
+images/
+mp3files/
+obj/
