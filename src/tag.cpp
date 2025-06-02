@@ -2,10 +2,10 @@
 #include <fstream>
 #include <string.h>
 #include <filesystem>
-#include "../include/Tag.h"
-#include "../include/FileExtension.h"
-#include "../include/FileNames.h"
-#include "../include/Genre.h"
+#include "../include/tag.h"
+#include "../include/fileExtension.h"
+#include "../include/fileNames.h"
+#include "../include/genre.h"
 
 void ID3v2Tag::writeHeaderFrame(std::fstream& file, unsigned int size) const{
     file.write(headerFrame, sizeof(headerFrame));

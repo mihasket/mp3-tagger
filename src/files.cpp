@@ -2,8 +2,8 @@
 #include <fstream>
 #include <string.h>
 #include <filesystem>
-#include "../include/FileExtension.h"
-#include "../include/Tag.h"
+#include "../include/fileExtension.h"
+#include "../include/tag.h"
 
 using std::filesystem::directory_iterator;
 

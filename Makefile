@@ -6,7 +6,7 @@ SRC := src
 INC := include
 OBJ := obj
 DIRECTORIES := mp3files/ images/ obj/
-OBJECTS := $(OBJ)/Main.o $(OBJ)/FileExtension.o $(OBJ)/FileNames.o $(OBJ)/Files.o $(OBJ)/Genre.o $(OBJ)/Tag.o
+OBJECTS := $(OBJ)/main.o $(OBJ)/fileExtension.o $(OBJ)/fileNames.o $(OBJ)/files.o $(OBJ)/genre.o $(OBJ)/tag.o
 
 compile: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(OBJ)/$(APPNAME) $(OBJECTS)

@@ -1,7 +1,7 @@
 #include <fstream>
-#include "../include/Tag.h"
-#include "../include/Files.h"
-#include "../include/FileNames.h"
+#include "../include/tag.h"
+#include "../include/files.h"
+#include "../include/fileNames.h"
 
 int main() {
     const unsigned int size = getNumberOfMp3Files();

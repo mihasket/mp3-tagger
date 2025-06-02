@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include "../include/FileExtension.h"
+#include "../include/fileExtension.h"
 
 using std::filesystem::directory_iterator;
 

@@ -1,4 +1,4 @@
-#include "../include/Genre.h"
+#include "../include/genre.h"
 
 const std::string Genre::genres[80] = {
     "Blues", "Classic Rock", "Country", "Dance",
