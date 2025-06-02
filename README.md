@@ -38,7 +38,7 @@ Artist: Miha
 Album: Github EP
 Track number: 1
 Release date: 2022
-Do you want to tag an image? (y,n): y
+Do you want to tag a genre? (y,n): y
 0. Blues
 1. Classic Rock
 2. Country
