@@ -1,8 +1,4 @@
 *.o
-*.mp3
-*.jpeg
-*.jpg
-*.png
 .vscode
 images/
 mp3files/
